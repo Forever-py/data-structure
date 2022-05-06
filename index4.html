@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>二维数据结构</title>
+</head>
+
+<body>
+    <script>
+        // 创建二叉树结构
+        function Node(value) {
+            this.value = value;
+            this.left = null;
+            this.right = null;
+        }
+
+        var a = new Node("a");
+        var b = new Node("b");
+        var c = new Node("c");
+        var d = new Node("d");
+        var e = new Node("e");
+        var f = new Node("f");
+        var g = new Node("g");
+        var h = new Node("h");
+        var j = new Node("j");
+        a.left = b;
+        a.right = c;
+        b.left = d;
+        b.right = e;
+        c.left = f;
+        c.right = g;
+        d.right = f;
+        e.right = j;
+        // 获取树的层级数
+        function getDeep(root) {
+            if (root == null) return 0;
+            var leftDeep = getDeep(root.left);
+            var rightDeep = getDeep(root.right);
+            return Math.max(leftDeep, rightDeep) + 1;
+        }
+        // 判断二叉树是否是平衡二叉树
+        function isBalance(root) {
+            if (root == null) return true;
+            var leftDeep = getDeep(root.left)
+            var rightDeep = getDeep(root.right);
+            if (Math.abs(leftDeep - rightDeep) <= 1) { // 当前节点平衡
+                return isBalance(root.left) && isBalance(root.right);
+            } else return false; // 不平衡
+        }
+
+        console.log(isBalance(a))
+
+
+        // 二叉树单旋
+        // 单选测试数据
+        // var node2 = new Node('2');
+        // var node5 = new Node('5');
+        // var node3 = new Node('3');
+        // var node6 = new Node('6');
+        // node2.right = node5;
+        // node5.left = node3;
+        // node5.right = node6;
+        // 双旋测试数据
+        var node8 = new Node('8');
+        var node7 = new Node('7');
+        var node6 = new Node('6');
+        var node5 = new Node('5');
+        var node2 = new Node('2');
+        node8.left = node7;
+        node7.left = node6;
+        node6.left = node5;
+        node5.left = node2;
+        // 左旋
+        function leftRotate(root) {
+            var newRoot = root.right; // 1、找到新根
+            var changeTree = root.right.left; // 2、找到变化分支   右子树的左子树
+            root.right = changeTree;  // 3、当前旋转节点的右孩子为变化分支
+            newRoot.left = root; // 4、新根的左孩子为旋转节点
+            return newRoot; // 5、返回新的根节点
+        }
+        // 右旋
+        function rightRotate(root) {
+            var newRoot = root.left; // 1、找到新根
+            var changeTree = root.left.right; // 2、找到变化分支   左子树的右子树
+            root.left = changeTree;  // 3、当前旋转节点的左孩子为变化分支
+            newRoot.right = root; // 4、新根的右孩子为旋转节点
+            return newRoot; // 5、返回新的根节点
+        }
+
+        function change(root) { // 返回平衡之后的根节点
+            if (isBalance(root)) return root;
+            if (root.left != null) root.left = change(root.left);
+            if (root.right != null) root.right = change(root.right);
+            var leftDeep = getDeep(root.left);
+            var rightDeep = getDeep(root.right);
+            if (Math.abs(leftDeep - rightDeep) < 2) {
+                return root;
+            } else if (leftDeep > rightDeep) { // 不平衡，左边深，需要右旋
+                var changeTreeDeep = getDeep(root.left.right);
+                var noChangeTreeDeep = getDeep(root.left.left);
+                if (changeTreeDeep > noChangeTreeDeep) {
+                    root.left = leftRotate(root.left);
+                }
+                var newRoot = rightRotate(root);
+                newRoot.right = change(newRoot.right);
+                newRoot = change(newRoot);
+                return newRoot;
+            } else {// 不平衡，右边深，需要左旋
+                var changeTreeDeep = getDeep(root.right.left);
+                var noChangeTreeDeep = getDeep(root.right.right);
+                if (changeTreeDeep > noChangeTreeDeep) {
+                    root.right = rightRotate(root.right);
+                }
+                var newRoot = leftRotate(root);
+                newRoot.left = change(newRoot.left);
+                newRoot = change(newRoot);
+                return newRoot;
+            }
+        }
+        // console.log(isBalance(node2),node2);
+        // 单选测试数据
+        // var newRoot = change(node2);
+        // console.log(isBalance(newRoot),newRoot);
+        // 双旋测试数据
+        var newRoot = change(node8);
+        console.log(isBalance(newRoot), newRoot);
+
+        // 树的深度优先搜索
+        function TreeNode(value) {
+            this.value = value;
+            this.childs = [];
+        }
+        var A = new TreeNode('A');
+        var B = new TreeNode('B');
+        var C = new TreeNode('C');
+        var D = new TreeNode('D');
+        var E = new TreeNode('E');
+        var F = new TreeNode('F');
+        A.childs.push(C);
+        A.childs.push(F);
+        A.childs.push(B);
+        B.childs.push(D);
+        B.childs.push(E);
+
+        // 树的深度遍历
+        function deepSearchB(root) {
+            if (root == null) return;
+            console.log(root.value);
+            for (var i = 0; i < root.childs.length; i++) {
+                deepSearchB(root.childs[i]);
+            }
+        }
+        deepSearchB(A);
+        console.log("--------------------------")
+        // 树的深度优先搜索
+        function deepSearch(root, target) {
+            if (root == null) return false;
+            if (root.value == target) return true;
+            var result = false;
+            for (var i = 0; i < root.childs.length; i++) {
+                result |= deepSearch(root.childs[i], target);
+            }
+            return result ? true : false;
+        }
+        console.log("====>", deepSearch(A, "C"));
+
+        console.log("--------------------------")
+        // 树的广度遍历
+        function bfsb(roots) {
+            if (roots == null || roots.length == 0) return;
+            var childs = [];
+            for (var i = 0; i < roots.length; i++) {
+                console.log(roots[i].value);
+                childs = childs.concat(roots[i].childs);
+            }
+            return bfsb(childs);
+        }
+        bfsb([A])
+        console.log("--------------------------")
+        // 树的广度优先搜索
+        function bfs(roots, target) {
+            if (roots == null || roots.length == 0) return false;
+            var childs = [];
+            for (var i = 0; i < roots.length; i++) {
+                if (roots[i].value == target) return true;
+                else childs = childs.concat(roots[i].childs);
+            }
+            return bfs(childs, target);
+        }
+        console.log("====>", bfs([A], "C"))
+        console.log("--------------------------")
+        // 创建图的结构
+        function TuNode(value) {
+            this.value = value;
+            this.neighbor = [];
+        }
+        var a = new TuNode('a');
+        var b = new TuNode('b');
+        var c = new TuNode('c');
+        var d = new TuNode('d');
+        var e = new TuNode('e');
+        a.neighbor.push(b);
+        a.neighbor.push(c);
+        b.neighbor.push(a);
+        b.neighbor.push(c);
+        b.neighbor.push(d);
+        c.neighbor.push(a);
+        c.neighbor.push(b);
+        c.neighbor.push(d);
+        d.neighbor.push(b);
+        d.neighbor.push(c);
+        d.neighbor.push(e);
+        e.neighbor.push(d);
+
+        function deepSearchTu(node, target, path) {
+            if (node == null) return false;
+            if (path.indexOf(node) > -1) return false;
+            if (node.value == target) return true;
+            path.push(node);
+            var result = false;
+            for (var i = 0; i < node.neighbor.length; i++) {
+                result |= deepSearchTu(node.neighbor[i], target, path);
+            }
+            return result ? true : false;
+        }
+        // 自己的理解写的
+        // function deepSearchTu(node, target, path) {
+        //     if(node == null) return false;
+        //     if(node.value == target) return true;
+        //     var result = false;
+        //     for(var i = 0; i < node.neighbor.length; i ++) {
+        //         if(path.indexOf(node.neighbor[i].value) == -1) {
+        //             path.push(node.neighbor[i].value);
+        //             result |= deepSearchTu(node.neighbor[i], target, path);
+        //         }
+        //     }
+        //     return result ? true : false;
+        // }
+        console.log("======>", deepSearchTu(a, 'e', []));
+        console.log("--------------------------")
+        // 图的广度优先搜索
+        function bfsTu(nodes, target, path) {
+            if (nodes == null || nodes.length == 0) return false;
+            var nextNode = [];
+            for (var i = 0; i < nodes.length; i++) {
+                if (path.indexOf(nodes[i]) > -1) continue;
+                path.push(nodes[i]);
+                if (nodes[i].value == target) return true;
+                else nextNode = nextNode.concat(nodes[i].neighbor);
+            }
+            return bfsTu(nextNode, target, path);
+        }
+        console.log("======>", bfsTu([a], 'e', []));
+
+        // 动态规划之斐波拉契数
+        function fibo(n) {
+            if (n <= 0) return -1;
+            if (n == 1) return 0;
+            if (n == 2) return 1;
+            return fibo(n - 1) + fibo(n - 2);
+        }
+        console.log(fibo(4));
+        console.log("--------------------------")
+
+        // 动态规划之青蛙跳台阶问题
+        // 一只青蛙，一次只能跳一级台阶，或者跳两级台阶
+        // 问：这只青蛙跳上n级台阶，有多少种跳法
+
+        // 如果这只青蛙，跳上了第n级台阶，那么最后一次跳跃之前，他一定在n-1级台阶，或者n-2级台阶上。
+        // 那么跳上n级台阶有多少种情况就变成了两个子问题
+        // 跳上n-1级台阶的跳法 + 跳上n-2级台阶的跳法。
+
+        // 按照此逻辑递推，跳上n-1级台阶可以才拆分成两个子问题
+        // 跳上n-2级台阶的跳法 + 跳上n-3级台阶的跳法。
+
+        // 所以 f(n) = f(n-1) + f(n-2);
+        function jump(n) {
+            if (n <= 0) return -1;
+            if (n == 1) return 1;
+            if (n == 2) return 2;
+            return jump(n - 1) + jump(n - 2);
+        }
+        console.log(jump(3));
+        console.log("--------------------------")
+
+        // 动态规划之变态青蛙跳台阶
+        // 这只青蛙，一次可以跳1级台阶、2级台阶、或者n级台阶
+        //  问：这只青蛙跳上n级台阶，有多少种跳法
+        function jumpB(n) {
+            if (n <= 0) return -1;
+            if (n == 1) return 1;
+            if (n == 2) return 2;
+            var result = 0;
+            for(var i = 1; i < n; i ++) {
+                result += jumpB(n - i);
+            }
+            return result + 1;  //  +1 表示从0级台阶直接跳上去的情况
+        }
+        console.log(jumpB(3));
+        console.log("--------------------------")
+
+        function linkNode(value) {
+            this.value = value;
+            this.next = null;
+        }
+        var l1 = new linkNode('1');
+        var l2 = new linkNode('2');
+        var l3 = new linkNode('3');
+        l1.next = l2;
+        l2.next = l3;
+        function reserveList(root) {
+            if(root == null || root.next == null) return root;
+            var p = reserveList(root.next);
+            root.next.next = root;
+            root.next = null;
+            return p;
+        }
+        var newl1 = reserveList(l1);
+        console.log(newl1);
+    </script>
+</body>
+
+</html>

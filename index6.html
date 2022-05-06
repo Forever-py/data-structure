@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    // 1、给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。
+    // 给定 nums = [2, 7, 11, 15], target = 9
+
+    // 因为 nums[0] + nums[1] = 2 + 7 = 9
+    // 所以返回 [0, 1]
+    function twoSum(nums, target) {
+      for (var i = 0; i < nums.length; i++) {
+        for (var j = i; j < nums.length; j++) {
+          if (nums[i] + nums[j] == target) {
+            return [i, j];
+          }
+        }
+      }
+      return [-1, -1];
+    }
+    console.log(twoSum([2, 7, 11, 15], 9));
+
+    // 2、给定两个链表分别代表两个非负整数，链表的每个结点分别分别存储整数的每位数字，且是逆序存储。求解这两个整数的和并以链表的形式返回计算的结果。
+    // 链表求和
+    var addTwoNumbers = function (l1, l2) {
+      // 创建新链表
+      const l3 = new ListNode(-1);
+      // 定义三个链表的指针
+      let [p1, p2, p3] = [l1, l2, l3];
+      // 进位，初始0
+      let c = 0;
+      while (p1 || p2) {
+        // 取出l1、l2当前节点的值，若遍历完了，则赋值为0
+        const val1 = p1 ? p1.val : 0;
+        const val2 = p2 ? p2.val : 0;
+        // 计算和
+        const val = val1 + val2 + c;
+        // 更新进位
+        c = Math.floor(val / 10);
+        // 更新l3的节点
+        p3.next = new ListNode(val % 10);
+        p1 = p1?.next;
+        p2 = p2?.next;
+        p3 = p3.next;
+      }
+      // 如果进位还有，加到l3最后
+      if (c) p3.next = new ListNode(c);
+      return l3.next;
+    };
+
+    // 3、给定一个字符串，找出其中最长没有重复子串的长度。
+    //   function getSubstring() {
+
+    //   }
+
+    // 4、给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
+    var removeNthFromEnd = function (head, n) {
+      if (head == null) return false;
+      let slow = head,
+        fast = head;
+      //让快指针先走
+      for (let i = 0; i < n; i++) {
+        fast = fast.next;
+      }
+      if (!fast) {
+        //判断是否n=1的情况，若是n=1的情况，fast此时应该为null，所以能触发这个条件
+        return head.next;
+      }
+      while (fast.next != null) {
+        slow = slow.next;
+        fast = fast.next;
+      }
+      slow.next = slow.next.next; //对要删除的值，指向进行更改，巧妙避开
+      return head;
+    };
+
+    /**
+     * Definition for a binary tree node.
+     *  */
+    function TreeNode(val, left, right) {
+      this.val = val === undefined ? 0 : val;
+      this.left = left === undefined ? null : left;
+      this.right = right === undefined ? null : right;
+    }
+
+    /**
+     * @param {number} n
+     * @return {TreeNode[]}
+     */
+    var generateTrees = function (n) {
+      if (n == 0) return [];
+      // 备忘录，避免重复计算
+      let memo = new Map();
+      /* 构造闭区间 [lo, hi] 组成的 BST */
+      const build = (lo, hi) => {
+        let res = [];
+        // base case，显然当lo > hi闭区间[lo, hi]肯定是个空区间，也就对应着空节点 null，
+        if (lo > hi) {
+          res.push(null);
+          return res;
+        }
+        let memoKey = `${lo}&${hi}`;
+        console.log(memoKey, lo, hi);
+        // 如果缓存当中有就直接拿
+        if (memo.has(memoKey)) return memo.get(memoKey);
+        // 1、穷举 root 节点的所有可能。
+        for (let i = lo; i <= hi; i++) {
+          // 2、递归构造出左右子树的所有合法 BST。
+          let leftTree = build(lo, i - 1);
+          let rightTree = build(i + 1, hi);
+          // 3、给 root 节点穷举所有左右子树的组合。
+          for (let left of leftTree) {
+            for (let right of rightTree) {
+              res.push(new TreeNode(i, left, right));
+            }
+          }
+        }
+        // 将结果集放入到缓存中
+        memo.set(memoKey, res);
+        return res;
+      };
+      // 构造闭区间 [1, n] 组成的 BST
+      return build(1, n);
+    };
+    generateTrees(3);
+
+    // 找不同
+    var findTheDifference = function (s, t) {
+      const cnt = new Array(26).fill(0);
+      for (const ch of s) {
+        cnt[ch.charCodeAt() - "a".charCodeAt()]++;
+      }
+      for (const ch of t) {
+        cnt[ch.charCodeAt() - "a".charCodeAt()]--;
+        if (cnt[ch.charCodeAt() - "a".charCodeAt()] < 0) {
+          return ch;
+        }
+      }
+      return " ";
+    };
+    findTheDifference("abcd", "abcde");
+
+    var CheckPermutation = function (s1, s2) {
+      if (s1.length != s2.length) return false;
+      if (s1.length <= 0) return true;
+      var ns1 = s1.split("").reverse();
+      var ns2 = s2.split("");
+      for (var i = 0; i < ns1.length; i++) {
+        if (ns1[i] != ns2[i]) return false;
+      }
+      return true;
+    };
+    console.log("===>", CheckPermutation("abc", "cba"));
+
+    // 回文排列
+    var canPermutePalindrome = function (s) {
+      var cnt = new Map();
+      var count = 0;
+      for (const cn of s) {
+        cnt.has(cn) ? cnt.set(cn, cnt.get(cn) + 1) : cnt.set(cn, 1);
+        console.log(cnt, cnt.get(cn))
+        if (cnt.get(cn) % 2 == 0) count--;
+        else count++;
+      }
+      if (count <= 1) return true;
+      else return false;
+    };
+    console.log(canPermutePalindrome("aab"));
+    console.log("--------------------------")
+
+    // 一次编辑
+    var oneEditAway = function (first, second) {
+      const l1 = first.length,
+        l2 = second.length,
+        differ = Math.abs(l1 - l2);
+      if (differ > 1) return false
+      if (first === second) return true
+      let l = 0
+      while (l < l1 && l < l2) {
+        console.log("===>", l);
+        if (first[l] === second[l]) {
+          l++
+        } else {
+          break
+        }
+      }
+      const set = new Set([first.slice(l + 1), first.slice(l), second.slice(l + 1), second.slice(l)])
+      return set.size < 4;
+    };
+    console.log(oneEditAway('palea', 'pelejc'));
+    console.log("--------------------------")
+
+    // 矩阵旋转
+    var rotate = function (matrix) {
+      for (let i = 0; i < matrix.length; i++) {
+        for (let j = i; j < matrix[i].length; j++) {
+          [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]]
+        }
+      }
+      matrix.forEach(row => row.reverse())
+    };
+    let matrix = [[1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]]
+    rotate(matrix);
+    console.log(matrix);
+    console.log("--------------------------")
+
+    // 零矩阵
+    var setZeroes = function (matrix) {
+      // 行、列
+      const [m, n] = [matrix.length, matrix[0]?.length];
+      // 创建行列是否要置零的数组，默认全是false
+      const row = new Array(m).fill(false);
+      const col = new Array(n).fill(false);
+
+      // 第一次遍历，找到需要置零的行、列
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (!matrix[i][j]) {
+            row[i] = col[j] = true;
+          }
+        }
+      }
+      console.log(row, col)
+      // 第二次遍历，在相应位置置零
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (row[i] || col[j]) {
+            matrix[i][j] = 0;
+          }
+        }
+      }
+      return matrix;
+    };
+    const zero = [[1, 1, 1], [1, 0, 1], [1, 1, 1]];
+    setZeroes(zero)
+    console.log(zero);
+    console.log("--------------------------")
+
+    // 字符串旋转问题
+    var isFlipedString = function (s1, s2) {
+      return s1.length === s2.length && (s1 + s1).indexOf(s2) !== -1;
+    };
+    console.log(isFlipedString("abcd", "acdb"));
+
+    // 分割链表
+    var partition = function (head, x) {
+      let small = new ListNode(0);
+      const smallHead = small;
+      let large = new ListNode(0);
+      const largeHead = large;
+      while (head !== null) {
+        if (head.val < x) {
+          small.next = head;
+          small = small.next;
+        } else {
+          large.next = head;
+          large = large.next;
+        }
+        head = head.next;
+      }
+      large.next = null;
+      small.next = largeHead.next;
+      return smallHead.next;
+    };
+
+
+
+  </script>
+</body>
+
+</html>

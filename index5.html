@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // const _permute = string => {
+        //     // 补全代码
+        //     var result = [];
+        //     if (string.length > 1) {
+        //         for (var m = 0; m < string.length; m++) {
+        //             var left = string[m];
+        //             var rest = string.slice(0, m) + string.slice(m + 1, string.length);
+        //             var perResult = _permute(rest);
+        //             for (var i = 0; i < perResult.length; i++) {
+        //                 var temp = left + perResult[i];
+        //                 result.push(temp);
+        //             }
+        //         }
+        //     } else if (string.length == 1) {
+        //         result.push(string);
+        //     }
+        //     return result;
+        // }
+
+        const _permute = string => {
+            // 补全代码
+            var result = [];
+            if (string.length > 1) {
+                for (var i = 0; i < string.length; i++) {
+                    var left = string[i];
+                    var rest = string.slice(0, i) + string.slice(i + 1, string.length);
+                    var preResult = _permute(rest);
+                    for (var j = 0; j < preResult.length; j++) {
+                        result.push(left + preResult[j]);
+                    }
+                }
+            } else if (string.length == 1) {
+                result.push(string);
+            }
+            return result;
+        }
+        console.log(_permute('abc'));
+        console.log("--------------------------")
+
+
+        let queen = new Array(8).fill(-1);
+        // 计数
+        let counter = 0;
+
+        // 判定（curRow，curCol）的位置是否可以放置皇后的方法
+        var isLegal = function (curRow, curCol) {
+            // 遍历前面几列
+            for (let preCol = 0; preCol < curCol; preCol++) {
+                let preRow = queen[preCol];
+                // 错误判定：目标行的位置已经有皇后了
+                if (preRow === curRow) {//因为是一列一列的插入的，因此列判定不需要
+                    return false;
+                }
+
+                //行与行的差值
+                let rowDiff = Math.abs(preRow - curRow);
+
+                //列与列的差值
+                let colDiff = Math.abs(curCol - preCol);
+
+                //若行列差值相同，则说明斜线上有皇后,不可摆放
+                if (rowDiff === colDiff) {
+                    return false
+                }
+            }
+            //遍历完成前几列都没有发现行列或斜线上有皇后，则返回true
+            return true
+        }
+
+        var eightQueen = function (curCol) {
+            // for循环含义：尝试将皇后放在当前列的每一行
+            for (let row = 0; row < 8; row++) {
+                if (isLegal(row, curCol)) {
+                    //放置皇后
+                    queen[curCol] = row;
+                    if (curCol != 7) {
+                        // 摆放下一列的皇后
+                        eightQueen(curCol + 1);
+                    } else {
+                        // 需要注意的是当curCol=7的时候，
+                        // 说明此时已经完成了一种摆放方法，
+                        // 然后for循环继续执行，去尝试其他摆放方法。
+                        counter++;
+                    }
+                }
+            }
+        }
+        eightQueen(0);
+        console.log(counter);//92
+    </script>
+</body>
+
+</html>
